@@ -49,7 +49,7 @@ message queue for each user
 clients = []
 # TODO: Part-1 : create a var to store username && password. NOTE: A set of username/password pairs are hardcoded here. 
 # e.g. userpass = [......]
-userpass = [ ['user1', 'pass1'], ['user2', 'pass2']. ['user3', 'pass3'] ]
+userpass = [ ['user1', 'pass1'], ['user2', 'pass2'], ['user3', 'pass3'] ]
 messages = [[],[],[]]
 count = 0
 
@@ -81,23 +81,23 @@ def clientThread(conn):
 			if option == str(1):
 				print 'user logout'
 				# TODO: Part-1: Add the logout processing here	
-                break
+		                break
 
 			elif option == str(2):
 				print 'Post a message'
             
-            elif option == str(3):
-                print 'Change password'
-                while True:
-                    verifyUserPass = stringToTuple(conn.recv(1024))
-                    if verifyUserPass in userpass:
-                        conn.sendall('Correct')
-                        newPasswd = stringToTuple(conn.recv(1024))
-                        userpass[user][1] = newPasswd[1]
-                        break
-                    else:
-                        conn.sendall('Incorrect')
-                        continue
+         	        elif option == str(3):
+           		        print 'Change password'
+                		while True:
+                    			verifyUserPass = stringToTuple(conn.recv(1024))
+                    			if verifyUserPass in userpass:
+                        			conn.sendall('Correct')
+                        			newPasswd = stringToTuple(conn.recv(1024))
+                        			userpass[user][1] = newPasswd[1]
+                        			break
+                    			else:
+                        			conn.sendall('Incorrect')
+                        			continue
 
 			else:
 				try :

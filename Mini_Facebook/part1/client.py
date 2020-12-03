@@ -15,9 +15,9 @@ def receiveThread(s):
 			
 			# You can add operations below once you receive msg
 			# from the server
-            if reply == 'Correct':
-                global validPasswd
-                validPasswd = True
+	                if reply == 'Correct':
+          		        global validPasswd
+                		validPasswd = True
 
 		except:
 			print "Connection closed"
@@ -100,32 +100,32 @@ if reply == 'valid': # TODO: use the correct string to replace xxx here!
 			if message == str(1):
 				print 'Logout'
 				# TODO: add logout operation
-                s.sendall(message)
-                break
+        		        s.sendall(message)
+                		break
 
 			if message == str(2):
 				print 'Post a message'
-                s.sendall(message)
+               		        s.sendall(message)
 
 			# Add other operations, e.g. change password
-            if message == str(3):
-                print 'Change password'
-                s.sendall(message)
+      		        if message == str(3):
+                		print 'Change password'
+                		s.sendall(message)
 
-                while True:
-                    oldPasswd = getpass.getpass("Enter old password: \n")
-                    reverify = tupleToString((username, oldPasswd))
-                    s.sendall(reverify)
-                    time.sleep(1)
+               			while True:
+                    			oldPasswd = getpass.getpass("Enter old password: \n")
+                    			reverify = tupleToString((username, oldPasswd))
+                    			s.sendall(reverify)
+                    			time.sleep(1)
 
-                    if(validPasswd):
-                        break
-                    else:
-                        continue
+                    			if(validPasswd):
+                        			break
+                    			else:
+                        			continue
                     
-                    newPasswd = getpass.getpass("Enter new password: \n")
-                    newPasswd = tupleToString((username, newPasswd))
-                    s.sendall(newPasswd)
+                    		newPasswd = getpass.getpass("Enter new password: \n")
+                    		newPasswd = tupleToString((username, newPasswd))
+                    		s.sendall(newPasswd)
 
 		except socket.error:
 			print 'Send failed'
