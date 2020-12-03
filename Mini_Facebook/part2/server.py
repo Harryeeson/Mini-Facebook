@@ -47,8 +47,6 @@ username && passwd
 message queue for each user
 '''
 clients = []
-# TODO: Part-1 : create a var to store username && password. NOTE: A set of username/password pairs are hardcoded here. 
-# e.g. userpass = [......]
 userpass = [ ['user1', 'pass1'], ['user2', 'pass2'], ['user3', 'pass3'] ]
 messages = [[],[],[]]
 subscriptions = [[],[],[]] # Store the group info
@@ -96,6 +94,10 @@ def clientThread(conn):
 					Part-2: Send private message
 					'''
 					print 'Sending private message'
+					pmsg = stringToTuple(conn.recv(1024))
+					rcv_id = stringToTuple(conn.recv(1024))
+
+					
 				if message == str(2):
 					'''
 					Part-2: Send broadcast message
@@ -116,6 +118,16 @@ def clientThread(conn):
 				'''
 				Part-2: Read offline message
 				'''
+
+			elif option == str(0):
+				count = 0
+				for x in userpass:
+					print(x)
+				print 'Popping'
+				userpass.pop(1)
+				for x in userpass:
+					print(x)
+				
 			else:
 				try :
 					conn.sendall('Option not valid')

@@ -39,7 +39,7 @@ try:
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 except socket.error, msg:
 	print 'Failed to create socket. Error code: ' + str(msg[0]) + ' , Error message : ' + msg[1]
-	sys.exit();
+	sys.exit()
 print 'Socket Created'
 
 '''
@@ -60,10 +60,6 @@ Connect to remote server
 s.connect((remote_ip , port))
 print 'Socket Connected to ' + host + ' on ip ' + remote_ip
 
-'''
-TODO: Part-1.1, 1.2: 
-Enter Username and Passwd
-'''
 # Whenever a user connects to the server, they should be asked for their username and password.
 # Username should be entered as clear text but passwords should not (should be either obscured or hidden). 
 # get username from input. HINT: raw_input(); get passwd from input. HINT: getpass()
@@ -103,20 +99,24 @@ if reply == 'valid':
 						'''
 						s.sendall(message)
 						if message == str(1):
-							pmsg = raw_input("Enter your private message\n")
+							pmsg = tupleToString(raw_input("Enter your private message\n"))
 							try :
 								'''
 								Part-2: Send private message
 								'''
+								s.sendall(pmsg)
+
 							except socket.error:
 								print 'Private Message Send failed'
 								sys.exit()
-							rcv_id = raw_input("Enter the recevier ID:\n")
+
+							rcv_id = tupleToString(raw_input("Enter the recevier ID:\n"))
 							try :
 								'''
 								Part-2: Send private message
 								'''
-								break
+								s.sendall(rcv_id)
+								#break
 							except socket.error:
 								print 'rcv_id Send failed'
 								sys.exit()
@@ -126,7 +126,7 @@ if reply == 'valid':
 								'''
 								Part-2: Send broadcast message
 								'''
-								break
+								#break
 							except socket.error:
 								print 'Broadcast Message Send failed'
 								sys.exit()
@@ -144,7 +144,7 @@ if reply == 'valid':
 								'''
 								Part-2: Send group message
 								'''
-								break
+								#break
 							except socket.error:
 								print 'g_id Send failed'
 								sys.exit()
@@ -200,6 +200,9 @@ if reply == 'valid':
 						sys.exit()
 				else:
 					print 'Option not valid'
+
+			if message == str(0):
+				
 		except socket.error:
 			print 'Send failed'
 			sys.exit()
