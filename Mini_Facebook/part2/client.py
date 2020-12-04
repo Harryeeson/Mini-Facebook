@@ -19,7 +19,7 @@ def receiveThread(s):
 			if reply == 'Pmsg':
 				time.sleep(1)
 				reply_pmsg = stringToTuple(s.recv(4096))
-				print 'Message from: ', reply_pmsg[1]
+				print 'Private message from: ', reply_pmsg[1]
 				print reply_pmsg[0]
 
 			elif reply == 'Bmsg':
@@ -27,7 +27,15 @@ def receiveThread(s):
 				reply_bmsg = s.recv(4096)
 				print 'Broadcasted Message: '
 				print reply_bmsg
-		
+
+			elif reply == 'Gmsg':
+				time.sleep(1)
+				reply_gmsg = stringToTuple(s.recv(4096))
+				print 'Group ', reply_gmsg[0], 'message from: ', reply_gmsg[2]
+				print reply_gmsg[1]
+			
+			elif reply == 'No_msg':
+				print 'No offline messages to read'
 
 		except:
 			print "Connection closed"
@@ -88,11 +96,13 @@ s.sendall(loginMsg)
 reply = s.recv(5)
 if reply == 'valid':
 	print 'Username and password valid'
-	ss = s.recv(4096)
+	s_pms = s.recv(4096)
 	'''
 	Part-2: Please printout the number of unread message once a new client login
 	'''
-	print 'You have ', ss, ' number of unread messages'
+	print 'You have ', s_pms, ' number of unread private messages'
+	s_gms = s.recv(4096)
+	print 'You have ', s_gms, ' number of unread group messages'
 
 	start_new_thread(receiveThread, (s,))
 	message = ""
@@ -141,7 +151,7 @@ if reply == 'valid':
 								print 'Broadcast Message Send failed'
 								sys.exit()
 						if message == str(3):
-							g_id = raw_input("Enter the Group ID:\n")
+							g_id = raw_input("Enter the Group:\n")
 							gsndr_msg = raw_input("Enter your group message\n")
 							gmsg = tupleToString((g_id, gsndr_msg))
 							try :
@@ -191,20 +201,25 @@ if reply == 'valid':
 				while not os.getpgrp() == os.tcgetpgrp(sys.stdout.fileno()):
 					pass
 				option = raw_input("Do you want to: 1. View all offline messages; 2. View only from a particular Group\n")
+				s.sendall(option)
 				if option == str(1):					
 					try :
 						'''
 						Part-2: View all offline messages
 						'''
+						
 					except socket.error:
 						print 'msg Send failed'
 						sys.exit()
+
 				elif option == str(2):
 					group = raw_input("Enter the group you want to view the messages from: ")
 					try :
 						'''
 						Part-2: View only from a particular group
 						'''
+						s.sendall(group)
+
 					except socket.error:
 						print 'group Send failed'
 						sys.exit()

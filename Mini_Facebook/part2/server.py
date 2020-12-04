@@ -49,7 +49,9 @@ message queue for each user
 clients = []
 userpass = [ ['user1', 'pass1'], ['user2', 'pass2'], ['user3', 'pass3'] ]
 # messages in format [receiver, msg, sender]
-messages = [] 
+messages = []
+# group messages in format [group #, receiver, msg, sender]
+grp_messages = []
 subscriptions = [ ['user1', 'user2'], ['user2', 'user3'], ['user3', 'user1'] ] # Store the group info
 
 '''
@@ -111,7 +113,7 @@ def clientThread(conn):
 
 						if online:
 							x.sendall('Pmsg')
-							x.sendall(str([pmsg[1], username]))
+							x.sendall(tupleToString((pmsg[1], username)))
 
 						else:
 							messages.append(str([pmsg[0], pmsg[1], username]))
@@ -125,7 +127,7 @@ def clientThread(conn):
 
 						if online:
 							x.sendall('Pmsg')
-							x.sendall(str([pmsg[1], username]))
+							x.sendall(tupleToString((pmsg[1], username)))
 
 						else:
 							messages.append(str([pmsg[0], pmsg[1], username]))
@@ -139,8 +141,6 @@ def clientThread(conn):
 
 						if online:
 							x.sendall('Pmsg')
-							print pmsg[1]
-							print username
 							x.sendall(tupleToString((pmsg[1], username)))
 
 						else:
@@ -167,8 +167,29 @@ def clientThread(conn):
 					gmsg = stringToTuple(conn.recv(1024))
 					g_id = int(gmsg[0])
 					g_id -= 1
-					for x in subscriptions[g_id]:
-						messages.append(str([x, gmsg[1]]))
+
+					for x in subscriptions[g_id]: 	# names of people in group
+						for y in clients:			# connected clients
+							online = False
+							peer = y.getpeername()
+
+							if peer[0] == '10.0.0.1':
+								online = True
+								break
+
+							elif peer[0] == '10.0.0.2':
+								online = True
+								break
+
+							elif peer[0] == '10.0.0.3':
+								online = True
+								break
+
+						if online:
+							y.sendall('Gmsg')
+							y.sendall(tupleToString((gmsg[0], gmsg[1], username))
+						else:
+							grp_messages.append(str(gmsg[0], x, gmsg[1], username]))
 
 			elif option == str(3):
 				print 'Group configuration'
@@ -182,7 +203,7 @@ def clientThread(conn):
 					grp -= 1
 					subscriptions[grp].append(username)
 
-				if message == str(2):
+				elif message == str(2):
 					print 'Quit group'
 					grp = int(conn.recv(1024))
 					grp -= 1
@@ -194,6 +215,30 @@ def clientThread(conn):
 				'''
 				Part-2: Read offline message
 				'''
+				message = conn.recv(1024)
+				no_msg = True
+				if message == str(1): # messages in format [receiver, msg, sender]
+					print 'View all offline messages'
+					for x in messages:
+						if x[0] == username:
+							no_msg = False
+							conn.sendall('Pmsg')
+							conn.sendall(tupleToString((x[1], x[2])))
+					if no_msg:
+						conn.sendall('No_msg')
+
+				elif message == str(2): # group messages in format [group #, receiver, msg, sender]
+					print 'View only from a particular group'
+					grp = conn.recv(1024)
+					for x in grp_messages:
+						if x[0] == grp and x[1] == username:
+							no_msg = False
+							conn.sendall('Gmsg')
+							conn.sendall(tupleToString((x[0], x[2], x[3])))
+					
+					if no_msg:
+						conn.sendall('No_msg')
+
 				
 			else:
 				try :
