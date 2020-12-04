@@ -75,7 +75,7 @@ s.sendall(loginMsg)
 reply = s.recv(5)
 if reply == 'valid':
 	print 'Username and password valid'
-	ss = s.recv(4096)
+	#ss = s.recv(4096)
 	'''
 	Part-2: Please printout the number of unread message once a new client login
 	'''
@@ -200,8 +200,9 @@ if reply == 'valid':
 						sys.exit()
 				else:
 					print 'Option not valid'
-
+	
 			if message == str(0):
+				continue
 				
 		except socket.error:
 			print 'Send failed'
