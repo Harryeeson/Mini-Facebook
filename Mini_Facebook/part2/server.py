@@ -48,8 +48,9 @@ message queue for each user
 '''
 clients = []
 userpass = [ ['user1', 'pass1'], ['user2', 'pass2'], ['user3', 'pass3'] ]
-messages = [[],[],[]]
-subscriptions = [[],[],[]] # Store the group info
+# messages in format [receiver, msg, sender]
+messages = [] 
+subscriptions = [ ['user1', 'user2'], ['user2', 'user3'], ['user3', 'user1'] ] # Store the group info
 
 '''
 Function for handling connections. This will be used to create threads
@@ -63,7 +64,7 @@ def clientThread(conn):
 	rcv_msg = stringToTuple(rcv_msg)
 	if rcv_msg in userpass:
 		user = userpass.index(rcv_msg)
-		
+		username = rcv_msg[0]
 		try :
 			conn.sendall('valid')
 		except socket.error:
@@ -75,6 +76,10 @@ def clientThread(conn):
 		After the user logs in, check the unread message for this user.
 		Return the number of unread messages to this user.
 		'''
+		for x in messages:
+			if username in x:
+				num_msg += 1
+		conn.sendall(num_msg)
 			
 		# Tips: Infinite loop so that function do not terminate and thread do not end.
 		while True:
@@ -94,39 +99,97 @@ def clientThread(conn):
 					Part-2: Send private message
 					'''
 					print 'Sending private message'
-					pmsg = stringToTuple(conn.recv(1024))
-					rcv_id = stringToTuple(conn.recv(1024))
+					pmsg = stringToTuple(conn.recv(1024))   # (rcv_id, sndr_msg)
+					online = False
+					if pmsg[0] == 'user1':
+						for x in clients:
+							peer = x.getpeername()
+							if peer[0] == '10.0.0.1':
+								online = True
+								break
 
+						if online:
+							x.sendall('Pmsg')
+							x.sendall(str([pmsg[1], username]))
+
+						else:
+							messages.append(str([pmsg[0], pmsg[1], username]))
+
+					elif pmsg[0] == 'user2':
+						for x in clients:
+							peer = x.getpeername()
+							if peer[0] == '10.0.0.2':
+								online = True
+								break
+
+						if online:
+							x.sendall('Pmsg')
+							x.sendall(str([pmsg[1], username]))
+
+						else:
+							messages.append(str([pmsg[0], pmsg[1], username]))
+
+					elif pmsg[0] == 'user3':
+						for x in clients:
+							peer = x.getpeername()
+							if peer[0] == '10.0.0.3':
+								online = True
+								break
+
+						if online:
+							x.sendall('Pmsg')
+							x.sendall(str([pmsg[1], username]))
+
+						else:
+							messages.append(str([pmsg[0], pmsg[1], username]))
+
+					else:
+						print 'Incorrect user'
 					
 				if message == str(2):
 					'''
 					Part-2: Send broadcast message
 					'''
 					print 'Sending broadcast message'
+					bmsg = conn.recv(1024)
+					for x in clients:
+						x.sendall('Bmsg')
+						x.sendall(bmsg)
+
 				if message == str(3):
 					'''
 					Part-2: Send group message
 					'''
 					print 'Sending group message'
+					gmsg = stringToTuple(conn.recv(1024))
+					g_id = int(gmsg[0])
+					g_id -= 1
+					for x in subscriptions[g_id]:
+						messages.append(str([x, gmsg[1]]))
+
 			elif option == str(3):
 				print 'Group configuration'
 				'''
 				Part-2: Join/Quit group
 				'''
+				if message == str(1):
+					print 'Join group'
+					grp = int(conn.recv(1024))
+					grp -= 1
+					subscriptions[grp].append(username)
+
+				if message == str(2):
+					print 'Quit group'
+					grp = int(conn.recv(1024))
+					grp -= 1
+					lctUser = subscriptions[grp].index(username)
+					subscriptions[grp].pop(lctUser)
+
 			elif option == str(4):
 				print 'Offline Messages'
 				'''
 				Part-2: Read offline message
 				'''
-
-			elif option == str(0):
-				count = 0
-				for x in userpass:
-					print(x)
-				print 'Popping'
-				userpass.pop(1)
-				for x in userpass:
-					print(x)
 				
 			else:
 				try :
@@ -180,4 +243,10 @@ while 1:
 		'''
 		Part-2: Implement the functionality to list all the available groups
 		'''
+		grp_cntr = 1
+		for x in subscriptions:
+			print 'Group ', grp_cntr
+			print x
+			grp_cntr += 1
+
 s.close()

@@ -16,6 +16,19 @@ def receiveThread(s):
 			# You can add operations below once you receive msg
 			# from the server
 
+			if reply == 'Pmsg':
+				time.sleep(1)
+				reply_pmsg = s.recv(4096)
+				print 'Message from: ', reply_pmsg[1]
+				print reply_pmsg[0]
+
+			elif reply == 'Bmsg':
+				time.sleep(1)
+				reply_bmsg = s.recv(4096)
+				print 'Broadcasted Message: '
+				print reply_bmsg
+		
+
 		except:
 			print "Connection closed"
 			break
@@ -75,10 +88,12 @@ s.sendall(loginMsg)
 reply = s.recv(5)
 if reply == 'valid':
 	print 'Username and password valid'
-	#ss = s.recv(4096)
+	ss = s.recv(4096)
 	'''
 	Part-2: Please printout the number of unread message once a new client login
 	'''
+	print 'You have ', ss, ' number of unread messages'
+
 	start_new_thread(receiveThread, (s,))
 	message = ""
 	while True :	
@@ -98,28 +113,22 @@ if reply == 'valid':
 						Part-2: Send option to server
 						'''
 						s.sendall(message)
+
 						if message == str(1):
-							pmsg = tupleToString(raw_input("Enter your private message\n"))
+							rcv_id = raw_input("Enter the recevier ID:\n")
+							sndr_msg = raw_input("Enter your private message\n")
+							pmsg = tupleToString((rcv_id, sndr_msg))
+
 							try :
 								'''
 								Part-2: Send private message
 								'''
 								s.sendall(pmsg)
-
-							except socket.error:
-								print 'Private Message Send failed'
-								sys.exit()
-
-							rcv_id = tupleToString(raw_input("Enter the recevier ID:\n"))
-							try :
-								'''
-								Part-2: Send private message
-								'''
-								s.sendall(rcv_id)
 								#break
 							except socket.error:
-								print 'rcv_id Send failed'
+								print 'Private message failed to send'
 								sys.exit()
+
 						if message == str(2):
 							bmsg = raw_input("Enter your broadcast message\n")
 							try :
@@ -127,26 +136,22 @@ if reply == 'valid':
 								Part-2: Send broadcast message
 								'''
 								#break
+								s.sendall(bmsg)
 							except socket.error:
 								print 'Broadcast Message Send failed'
 								sys.exit()
 						if message == str(3):
-							gmsg = raw_input("Enter your group message\n")
-							try :
-								'''
-								Part-2: Send group message
-								'''
-							except socket.error:
-								print 'Group Message Send failed'
-								sys.exit()
 							g_id = raw_input("Enter the Group ID:\n")
+							gsndr_msg = raw_input("Enter your group message\n")
+							gmsg = tupleToString((g_id, gsndr_msg))
 							try :
 								'''
 								Part-2: Send group message
 								'''
+								s.sendall(gmsg)
 								#break
 							except socket.error:
-								print 'g_id Send failed'
+								print 'Group message failed to send'
 								sys.exit()
 					except socket.error:
 						print 'Message Send failed'
@@ -155,12 +160,15 @@ if reply == 'valid':
 			if message == str(3):
 				print 'Group configuration'
 				option = raw_input("Do you want to: 1. Join Group 2. Quit Group: \n")
+				s.sendall(option)
 				if option == str(1):
 					group = raw_input("Enter the Group you want to join: ")
 					try :
 						'''
 						Part-2: Join a particular group
 						'''
+						s.sendall(group)
+
 					except socket.error:
 						print 'group info sent failed'
 						sys.exit()
@@ -170,6 +178,8 @@ if reply == 'valid':
 						'''
 						Part-2: Quit a particular group
 						'''
+						s.sendall(group)
+
 					except socket.error:
 						print 'group info sent failed'
 						sys.exit()
@@ -201,9 +211,6 @@ if reply == 'valid':
 				else:
 					print 'Option not valid'
 	
-			if message == str(0):
-				continue
-				
 		except socket.error:
 			print 'Send failed'
 			sys.exit()
