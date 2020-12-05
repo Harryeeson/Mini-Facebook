@@ -112,7 +112,7 @@ if reply == 'valid':
 	start_new_thread(receiveThread, (s,))
 	message = ""
 	while True :	
-		message = raw_input("Choose an option (type the number): \n 1. Logout \n 2. Send messages \n 3. Group Configuration \n 4. Offline message \n")		
+		message = raw_input("Choose an option (type the number): \n 1. Logout \n 2. Send messages \n 3. Group Configuration \n")		
 		try :
 			s.sendall(message)
 			if message == str(1):
@@ -130,7 +130,7 @@ if reply == 'valid':
 						s.sendall(message)
 
 						if message == str(1):
-							rcv_id = raw_input("Enter the recevier ID:\n")
+							rcv_id = raw_input("Enter the recevier:\n")
 							sndr_msg = raw_input("Enter your private message\n")
 							pmsg = tupleToString((rcv_id, sndr_msg))
 

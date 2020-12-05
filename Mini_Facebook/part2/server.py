@@ -111,6 +111,7 @@ def clientThread(conn):
 					pmsg = stringToTuple(conn.recv(1024))   # (rcv_id, sndr_msg)
 					online = False
 					if pmsg[0] == 'user1':
+						count += 1
 						for x in clients:
 							peer = x.getpeername()
 							if peer[0] == '10.0.0.1':
@@ -125,6 +126,7 @@ def clientThread(conn):
 							messages.append([pmsg[0], pmsg[1], username])
 
 					elif pmsg[0] == 'user2':
+						count += 1
 						for x in clients:
 							peer = x.getpeername()
 							if peer[0] == '10.0.0.2':
@@ -139,6 +141,7 @@ def clientThread(conn):
 							messages.append([pmsg[0], pmsg[1], username])
 
 					elif pmsg[0] == 'user3':
+						count += 1
 						for x in clients:
 							peer = x.getpeername()
 							if peer[0] == '10.0.0.3':
@@ -164,6 +167,7 @@ def clientThread(conn):
 					for x in clients:
 						x.sendall('Bmsg')
 						x.sendall(bmsg)
+					count += 1
 
 				elif message == str(3):
 					'''
@@ -180,6 +184,7 @@ def clientThread(conn):
 							in_group = True
 
 					if in_group:
+						count += 1
 						for x in subscriptions[g_id]:
 							if x != username:
 								for y in clients:
@@ -237,27 +242,26 @@ def clientThread(conn):
 				'''
 				message = conn.recv(1024)
 				no_msg = True
+				ctr = 0
 				if message == str(1): # messages in format [receiver, msg, sender]
 					print 'View all offline messages'
 					print username
-					count = 0
 					for x in range(len(messages)):
-						if messages[count][0] == username:
+						if messages[ctr][0] == username:
 							no_msg = False
 							conn.sendall('Pmsg')
 							time.sleep(1)
-							conn.sendall(tupleToString((messages[count][1], messages[count][2])))
+							conn.sendall(tupleToString((messages[ctr][1], messages[ctr][2])))
 							time.sleep(1)
-							messages.pop(count)
+							messages.pop(ctr)
 						else:
-							count += 1
+							ctr += 1
 					if no_msg:
 						conn.sendall('No_msg')
 
 				elif message == str(2): # group messages in format [group #, receiver, msg, sender]
 					print 'View only from a particular group'
 					grp = conn.recv(1024)
-					ctr = 0
 					for x in range(len(grp_messages)):
 						if grp_messages[ctr][0] == grp and grp_messages[ctr][1] == username:
 							no_msg = False
@@ -331,11 +335,5 @@ while 1:
 			print 'Group ', grp_cntr
 			print x
 			grp_cntr += 1
-	elif message == 'listmessages':
-		for x in messages:
-			print x
-	elif message == 'listgrpmsg':
-		for x in grp_messages:
-			print x
 
 s.close()
