@@ -174,24 +174,29 @@ def clientThread(conn):
 					g_id = int(gmsg[0])
 					g_id -= 1
 					in_group = False
+					
 					for z in subscriptions[g_id]:
 						if z == username:
 							in_group = True
+
 					if in_group:
-						for x in subscriptions[g_id]: 	# names of people in group
-							for y in clients:			# connected clients
-								online = False
-								peer = y.getpeername()
-								if conn.getpeername() == peer:
-									continue
-								if peer[0] == '10.0.0.1':
-									online = True
+						for x in subscriptions[g_id]:
+							if x != username:
+								for y in clients:
+									online = False
+									peer = y.getpeername()
 
-								elif peer[0] == '10.0.0.2':
-									online = True
+									if peer[0] == '10.0.0.1' and x == 'user1':
+										online = True
+										break
 
-								elif peer[0] == '10.0.0.3':
-									online = True
+									elif peer[0] == '10.0.0.2' and x == 'user2':
+										online = True
+										break
+
+									elif peer[0] == '10.0.0.3' and x == 'user3':
+										online = True
+										break
 
 								if online:
 									y.sendall('Gmsg')
@@ -199,8 +204,10 @@ def clientThread(conn):
 									y.sendall(tupleToString((gmsg[0], gmsg[1])))
 									time.sleep(1)
 									y.sendall(tupleToString((username, 'foo')))
+
 								else:
 									grp_messages.append(str(gmsg[0], x, gmsg[1], username))
+
 					else:
 						conn.sendall('No_grp')
 		
