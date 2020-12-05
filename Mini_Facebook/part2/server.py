@@ -60,6 +60,7 @@ Function for handling connections. This will be used to create threads
 def clientThread(conn):
 	global clients
 	global count
+	count = 0
 	# Tips: Sending message to connected client
 	conn.send('Welcome to the server. Please enter your username and password.') #send only takes string
 	rcv_msg = conn.recv(1024)
