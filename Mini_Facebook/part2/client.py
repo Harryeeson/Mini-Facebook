@@ -33,7 +33,6 @@ def receiveThread(s):
 				reply_gmsg = stringToTuple(s.recv(4096))
 				#time.sleep(1)
 				msg_from = stringToTuple(s.recv(4096))
-				print msg_from
 				print 'Group ', reply_gmsg[0], 'message from: ', msg_from[0]
 				print reply_gmsg[1]
 			

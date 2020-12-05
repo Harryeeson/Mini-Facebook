@@ -86,7 +86,7 @@ def clientThread(conn):
 		conn.sendall(str(num_pmsg))
 		time.sleep(1)
 		for y in grp_messages:
-			if username == grp_messages[1]:
+			if username == y[1]:
 				num_gmsg += 1
 		conn.sendall(str(num_gmsg))
 			
@@ -122,7 +122,7 @@ def clientThread(conn):
 							x.sendall(tupleToString((pmsg[1], username)))
 
 						else:
-							messages.append(str([pmsg[0], pmsg[1], username]))
+							messages.append([pmsg[0], pmsg[1], username])
 
 					elif pmsg[0] == 'user2':
 						for x in clients:
@@ -136,7 +136,7 @@ def clientThread(conn):
 							x.sendall(tupleToString((pmsg[1], username)))
 
 						else:
-							messages.append(str([pmsg[0], pmsg[1], username]))
+							messages.append([pmsg[0], pmsg[1], username])
 
 					elif pmsg[0] == 'user3':
 						for x in clients:
@@ -150,7 +150,7 @@ def clientThread(conn):
 							x.sendall(tupleToString((pmsg[1], username)))
 
 						else:
-							messages.append(str([pmsg[0], pmsg[1], username]))
+							messages.append([pmsg[0], pmsg[1], username])
 
 					else:
 						print 'Incorrect user'
@@ -206,7 +206,7 @@ def clientThread(conn):
 									y.sendall(tupleToString((username, 'foo')))
 
 								else:
-									grp_messages.append(str(gmsg[0], x, gmsg[1], username))
+									grp_messages.append([gmsg[0], x, gmsg[1], username])
 
 					else:
 						conn.sendall('No_grp')
@@ -239,22 +239,36 @@ def clientThread(conn):
 				no_msg = True
 				if message == str(1): # messages in format [receiver, msg, sender]
 					print 'View all offline messages'
-					for x in messages:
-						if x[0] == username:
+					print username
+					count = 0
+					for x in range(len(messages)):
+						if messages[count][0] == username:
 							no_msg = False
 							conn.sendall('Pmsg')
-							conn.sendall(tupleToString((x[1], x[2])))
+							time.sleep(1)
+							conn.sendall(tupleToString((messages[count][1], messages[count][2])))
+							time.sleep(1)
+							messages.pop(count)
+						else:
+							count += 1
 					if no_msg:
 						conn.sendall('No_msg')
 
 				elif message == str(2): # group messages in format [group #, receiver, msg, sender]
 					print 'View only from a particular group'
 					grp = conn.recv(1024)
-					for x in grp_messages:
-						if x[0] == grp and x[1] == username:
+					ctr = 0
+					for x in range(len(grp_messages)):
+						if grp_messages[ctr][0] == grp and grp_messages[ctr][1] == username:
 							no_msg = False
 							conn.sendall('Gmsg')
-							conn.sendall(tupleToString((x[0], x[2], x[3])))
+							time.sleep(1)
+							conn.sendall(tupleToString((grp_messages[ctr][0], grp_messages[ctr][2])))
+							time.sleep(1)
+							conn.sendall(tupleToString((grp_messages[ctr][3], 'foo')))
+							grp_messages.pop(ctr)
+						else:
+							ctr+= 1
 					
 					if no_msg:
 						conn.sendall('No_msg')
@@ -317,5 +331,11 @@ while 1:
 			print 'Group ', grp_cntr
 			print x
 			grp_cntr += 1
+	elif message == 'listmessages':
+		for x in messages:
+			print x
+	elif message == 'listgrpmsg':
+		for x in grp_messages:
+			print x
 
 s.close()
