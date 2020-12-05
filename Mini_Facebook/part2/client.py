@@ -18,7 +18,7 @@ def receiveThread(s):
 
 			if reply == 'Pmsg':
 				time.sleep(1)
-				reply_pmsg = s.recv(4096)
+				reply_pmsg = stringToTuple(s.recv(4096))
 				print 'Message from: ', reply_pmsg[1]
 				print reply_pmsg[0]
 
@@ -104,7 +104,7 @@ if reply == 'valid':
 				print 'Logout'
 				break
 				
-			if message == str(2):
+			elif message == str(2):
 				print 'Send message'
 				while True:
 					message = raw_input("Choose an option (type the number): \n 1. Private messages \n 2. Broadcast messages \n 3. Group messages \n")
@@ -124,7 +124,7 @@ if reply == 'valid':
 								Part-2: Send private message
 								'''
 								s.sendall(pmsg)
-								#break
+								break
 							except socket.error:
 								print 'Private message failed to send'
 								sys.exit()
@@ -135,7 +135,7 @@ if reply == 'valid':
 								'''
 								Part-2: Send broadcast message
 								'''
-								#break
+								break
 								s.sendall(bmsg)
 							except socket.error:
 								print 'Broadcast Message Send failed'
@@ -149,7 +149,7 @@ if reply == 'valid':
 								Part-2: Send group message
 								'''
 								s.sendall(gmsg)
-								#break
+								break
 							except socket.error:
 								print 'Group message failed to send'
 								sys.exit()
@@ -157,7 +157,7 @@ if reply == 'valid':
 						print 'Message Send failed'
 						sys.exit() 
 					
-			if message == str(3):
+			elif message == str(3):
 				print 'Group configuration'
 				option = raw_input("Do you want to: 1. Join Group 2. Quit Group: \n")
 				s.sendall(option)
@@ -186,7 +186,7 @@ if reply == 'valid':
 				else:
 					print 'Option not valid'
 			
-			if message == str(4):
+			elif message == str(4):
 				print 'Offline messages'
 				while not os.getpgrp() == os.tcgetpgrp(sys.stdout.fileno()):
 					pass

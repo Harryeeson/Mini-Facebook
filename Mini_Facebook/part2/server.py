@@ -76,10 +76,11 @@ def clientThread(conn):
 		After the user logs in, check the unread message for this user.
 		Return the number of unread messages to this user.
 		'''
+		num_msg = 0
 		for x in messages:
 			if username in x:
 				num_msg += 1
-		conn.sendall(num_msg)
+		conn.sendall(str(num_msg))
 			
 		# Tips: Infinite loop so that function do not terminate and thread do not end.
 		while True:
@@ -138,7 +139,9 @@ def clientThread(conn):
 
 						if online:
 							x.sendall('Pmsg')
-							x.sendall(str([pmsg[1], username]))
+							print pmsg[1]
+							print username
+							x.sendall(tupleToString((pmsg[1], username)))
 
 						else:
 							messages.append(str([pmsg[0], pmsg[1], username]))
@@ -146,7 +149,7 @@ def clientThread(conn):
 					else:
 						print 'Incorrect user'
 					
-				if message == str(2):
+				elif message == str(2):
 					'''
 					Part-2: Send broadcast message
 					'''
@@ -156,7 +159,7 @@ def clientThread(conn):
 						x.sendall('Bmsg')
 						x.sendall(bmsg)
 
-				if message == str(3):
+				elif message == str(3):
 					'''
 					Part-2: Send group message
 					'''
@@ -172,6 +175,7 @@ def clientThread(conn):
 				'''
 				Part-2: Join/Quit group
 				'''
+				message = conn.recv(1024)
 				if message == str(1):
 					print 'Join group'
 					grp = int(conn.recv(1024))
