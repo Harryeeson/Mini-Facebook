@@ -29,11 +29,17 @@ def receiveThread(s):
 				print reply_bmsg
 
 			elif reply == 'Gmsg':
-				time.sleep(1)
+				#time.sleep(1)
 				reply_gmsg = stringToTuple(s.recv(4096))
-				print 'Group ', reply_gmsg[0], 'message from: ', reply_gmsg[2]
+				#time.sleep(1)
+				msg_from = stringToTuple(s.recv(4096))
+				print msg_from
+				print 'Group ', reply_gmsg[0], 'message from: ', msg_from[0]
 				print reply_gmsg[1]
 			
+			elif reply == 'No_grp':
+				print 'Cannot send message. You are not in this group.'
+
 			elif reply == 'No_msg':
 				print 'No offline messages to read'
 
@@ -139,18 +145,18 @@ if reply == 'valid':
 								print 'Private message failed to send'
 								sys.exit()
 
-						if message == str(2):
+						elif message == str(2):
 							bmsg = raw_input("Enter your broadcast message\n")
 							try :
 								'''
 								Part-2: Send broadcast message
 								'''
-								break
 								s.sendall(bmsg)
+								break
 							except socket.error:
 								print 'Broadcast Message Send failed'
 								sys.exit()
-						if message == str(3):
+						elif message == str(3):
 							g_id = raw_input("Enter the Group:\n")
 							gsndr_msg = raw_input("Enter your group message\n")
 							gmsg = tupleToString((g_id, gsndr_msg))
